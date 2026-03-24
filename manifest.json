@@ -1,0 +1,12 @@
+{
+  "name": "72F Design System Generator",
+  "id": "766c8958-8dbf-419e-ae85-2ea9afc88718",
+  "permissions": [
+    "content:read",
+    "content:write",
+    "library:read",
+    "library:write"
+  ],
+  "code": "plugin-v1.js",
+  "ui": "index.html"
+}
