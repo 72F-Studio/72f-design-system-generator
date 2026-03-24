@@ -32,7 +32,7 @@ A comprehensive "one-stop shop" Penpot plugin for generating and managing atomic
 I build tools that bridge the gap between high-level design theory and functional developer implementation. 
 
 📧 **Contact**: [parth.k.design@gmail.com](mailto:parth.k.design@gmail.com)  
-🌐 **Studio**: [72F Studio](https://72f.studio)
+🌐 **Studio**: [72F Studio](https://72fstudio.in)
 
 ---
 
