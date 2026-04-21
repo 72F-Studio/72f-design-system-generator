@@ -2,6 +2,7 @@
   "name": "72f-studio-architect",
   "version": "2.27.0",
   "type": "module",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "vite",
     "build": "vite build && vite build --mode plugin && cp manifest.json dist/manifest.json",
