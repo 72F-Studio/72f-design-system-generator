@@ -5,7 +5,8 @@ import type { Preset, ColorRole } from './presets/types';
 
 console.log('[72F] Generator v2.0 active.');
 
-penpot.ui.open('72F Design System Generator', '', { width: 920, height: 680 });
+declare const __UI_URL__: string;
+penpot.ui.open('72F Design System Generator', __UI_URL__, { width: 920, height: 680 });
 
 // ── UTILITIES ─────────────────────────────────────────────────────────────────
 
