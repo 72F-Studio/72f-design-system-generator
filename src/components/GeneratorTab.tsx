@@ -1,231 +1,452 @@
-import React, { useState, useEffect } from "react";
-import { PRESETS } from "../presets/data";
-import { getContrastRatio, getWCAGLevel, ensureContrast } from "../utils/accessibility";
-import { Trash2, Plus, Sparkles, ChevronDown, Check, Zap, PencilRuler, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { PRESETS } from '../presets/data';
+import type { Preset, ColorRole, FontFamily, TokenGroup } from '../presets/types';
+import { ChevronDown, Zap, RefreshCw, Trash2, Plus } from 'lucide-react';
+
+const DENSITY_LABELS: Record<string, string> = {
+    '0.75': 'Compact',
+    '1.0':  'Default',
+    '1.25': 'Comfortable',
+    '1.5':  'Spacious',
+};
+
+const CATEGORIES = [
+    { id: 'all',        label: 'All' },
+    { id: 'enterprise', label: 'Enterprise' },
+    { id: 'modern',     label: 'Modern' },
+    { id: 'web',        label: 'Web' },
+    { id: 'mobile',     label: 'Mobile' },
+] as const;
+
+const COLOR_ROLES: ColorRole[] = ['primary','secondary','tertiary','neutral','success','warning','error','info'];
+const FONT_FAMILIES: FontFamily[] = ['heading','body','mono'];
+const FONT_WEIGHTS = ['100','200','300','400','500','600','700','800','900'];
+
+const ROLE_COLORS: Record<string, string> = {
+    primary:   'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    secondary: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    tertiary:  'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    neutral:   'bg-zinc-500/20 text-zinc-400 border-zinc-500/30',
+    success:   'bg-green-500/20 text-green-300 border-green-500/30',
+    warning:   'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    error:     'bg-red-500/20 text-red-300 border-red-500/30',
+    info:      'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+};
+
+interface DraftColor {
+    name: string;
+    hex: string;
+    role: ColorRole;
+}
+
+interface DraftTypeRole {
+    path: string;
+    size: number;
+    weight: string;
+    lineHeight: number;
+    letterSpacing: string;
+    family: FontFamily;
+    group: TokenGroup;
+}
+
+interface Draft {
+    fonts: { heading: string; body: string; mono: string; monoFallbacks: string[] };
+    colors: DraftColor[];
+    typeRoles: DraftTypeRole[];
+}
+
+// Normalize any color value to 6-digit hex for <input type="color">.
+// Falls back to #6366f1 if unparseable (e.g. rgba values).
+const toHex6 = (v: string): string => {
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) return v;
+    if (/^#[0-9a-fA-F]{3}$/.test(v)) {
+        const [, r, g, b] = v.match(/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/)!;
+        return `#${r}${r}${g}${g}${b}${b}`;
+    }
+    return '#6366f1';
+};
+
+const inputCls = 'bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 focus:outline-none focus:border-primary transition-all';
 
 export default function GeneratorTab() {
-  const [selectedPresetId, setSelectedPreset] = useState("");
-  const [density, setDensity] = useState("1.0");
-  const [gridCols, setGridCols] = useState("12");
-  const [availableFonts, setAvailableFonts] = useState<string[]>([]);
-  const [activeSubTab, setActiveSubTab] = useState("foundations");
-  
-  // State for the generated system
-  const [sets, setSets] = useState<any[]>([]);
-  const [themeName, setThemeName] = useState("");
+    const [selectedPresetId, setSelectedPresetId] = useState('');
+    const [preset, setPreset] = useState<Preset | null>(null);
+    const [draft, setDraft] = useState<Draft | null>(null);
+    const [themeName, setThemeName] = useState('');
+    const [density, setDensity] = useState('1.0');
+    const [availableFonts, setAvailableFonts] = useState<string[]>([]);
+    const [categoryFilter, setCategoryFilter] = useState('all');
+    const [isDeploying, setIsDeploying] = useState(false);
 
-  useEffect(() => {
-    const handleMsg = (e: MessageEvent) => {
-      if (e.data.type === 'available-fonts') setAvailableFonts(e.data.data);
+    useEffect(() => {
+        const handleMsg = (e: MessageEvent) => {
+            if (e.data.type === 'available-fonts') setAvailableFonts(e.data.data);
+            if (e.data.type === 'log' && (e.data.level === 'success' || e.data.level === 'error')) {
+                setIsDeploying(false);
+            }
+        };
+        window.addEventListener('message', handleMsg);
+        window.parent.postMessage({ type: 'UI_READY' }, '*');
+        return () => window.removeEventListener('message', handleMsg);
+    }, []);
+
+    const onPresetChange = (id: string) => {
+        const p = PRESETS.find(x => x.id === id);
+        if (!p) return;
+        setSelectedPresetId(id);
+        setPreset(p);
+        setThemeName(`${p.name} Theme`);
+        setDraft({
+            fonts:     { ...p.fonts },
+            colors:    p.colors.map(c => ({ ...c })),
+            typeRoles: p.typeRoles.map(r => ({ ...r })),
+        });
     };
-    window.addEventListener("message", handleMsg);
-    window.parent.postMessage({ type: 'UI_READY' }, '*');
-    return () => window.removeEventListener("message", handleMsg);
-  }, []);
 
-  const onPresetChange = (id: string) => {
-    setSelectedPreset(id);
-    const preset = PRESETS.find(p => p.id === id);
-    if (!preset) return;
+    // ── Draft helpers ────────────────────────────────────────────────────────
+    const updateFont = (key: 'heading' | 'body' | 'mono', value: string) =>
+        setDraft(d => d ? { ...d, fonts: { ...d.fonts, [key]: value } } : d);
 
-    setThemeName(`${preset.name} Theme`);
-    const lightSet = createSetData(preset, 'light');
-    const darkSet = createSetData(preset, 'dark');
-    setSets([lightSet, darkSet]);
-  };
+    const updateColor = (i: number, field: keyof DraftColor, value: string) =>
+        setDraft(d => d ? {
+            ...d,
+            colors: d.colors.map((c, idx) => idx === i ? { ...c, [field]: value } : c),
+        } : d);
 
-  const createSetData = (preset: any, mode: 'light' | 'dark' | 'custom') => {
-    let bgHex = (mode === 'dark') ? "#111111" : (preset.defaults.colors.find((c:any) => c.name.toLowerCase().includes('background'))?.hex || "#ffffff");
-    const colors = [...preset.defaults.colors];
-    const hasColor = (n: string) => colors.some(c => c.name.toLowerCase().includes(n));
-    const primary = colors.find((c:any) => c.name.toLowerCase().includes('primary') || c.name.toLowerCase().includes('brand'))?.hex || '#006FEE';
-    
-    if (!hasColor('success')) colors.push({ name: 'Success', hex: '#17c964' });
-    if (!hasColor('error')) colors.push({ name: 'Error', hex: '#f31260' });
-    if (!hasColor('warning')) colors.push({ name: 'Warning', hex: '#f5a524' });
-    if (!hasColor('info')) colors.push({ name: 'Info', hex: '#006FEE' });
-    if (!hasColor('link')) colors.push({ name: 'Link', hex: primary });
+    const addColor = () =>
+        setDraft(d => d ? {
+            ...d,
+            colors: [...d.colors, { name: 'New Color', hex: '#6366f1', role: 'primary' as ColorRole }],
+        } : d);
 
-    const adjustedColors = colors.map(c => {
-        let fHex = c.name.toLowerCase().includes('background') ? bgHex : (c.name.toLowerCase().includes('foreground') ? (mode === 'dark' ? "#eeeeee" : "#111111") : ensureContrast(c.hex, bgHex));
-        return { name: c.name, hex: fHex };
-    });
+    const removeColor = (i: number) =>
+        setDraft(d => d ? { ...d, colors: d.colors.filter((_, idx) => idx !== i) } : d);
 
-    return {
-      name: mode === 'light' ? "Light Set" : (mode === 'dark' ? "Dark Set" : "New Set"),
-      colors: adjustedColors,
-      fonts: { ...preset.defaults.fonts }
+    const updateTypeRole = (i: number, field: keyof DraftTypeRole, value: string | number) =>
+        setDraft(d => d ? {
+            ...d,
+            typeRoles: d.typeRoles.map((r, idx) => idx === i ? { ...r, [field]: value } : r),
+        } : d);
+
+    const addTypeRole = () =>
+        setDraft(d => d ? {
+            ...d,
+            typeRoles: [...d.typeRoles, {
+                path: 'body/new', size: 14, weight: '400',
+                lineHeight: 1.5, letterSpacing: '0em',
+                family: 'body' as FontFamily, group: 'body' as TokenGroup,
+            }],
+        } : d);
+
+    const removeTypeRole = (i: number) =>
+        setDraft(d => d ? { ...d, typeRoles: d.typeRoles.filter((_, idx) => idx !== i) } : d);
+
+    const deploy = () => {
+        if (!preset || !draft) return;
+        setIsDeploying(true);
+        window.parent.postMessage({
+            type: 'GENERATE_SYSTEM',
+            preset: { ...preset, fonts: draft.fonts, colors: draft.colors, typeRoles: draft.typeRoles },
+            themeName: themeName || `${preset.name} Theme`,
+            monoOverride: draft.fonts.mono,
+            density: parseFloat(density),
+        }, '*');
     };
-  };
 
-  const deploy = () => {
-    const preset = activeSubTab === 'foundations' ? PRESETS.find(p => p.id === selectedPresetId) : PRESETS[0];
-    window.parent.postMessage({
-      type: 'GENERATE_SYSTEM',
-      preset: preset || PRESETS[0],
-      themeName: themeName || "Custom System",
-      sets,
-      layout: { density: parseFloat(density), gridCols: parseInt(gridCols) }
-    }, '*');
-  };
+    const filteredPresets = categoryFilter === 'all'
+        ? PRESETS
+        : PRESETS.filter(p => p.category === categoryFilter);
 
-  return (
-    <div className="space-y-10 pb-40 animate-in fade-in duration-500">
-      {/* Sub-Tabs */}
-      <div className="flex p-1.5 bg-zinc-900 border border-zinc-800 rounded-2xl">
-        <button
-          onClick={() => setActiveSubTab("foundations")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === "foundations" ? "bg-zinc-800 text-white shadow-inner" : "text-zinc-500 hover:text-zinc-400"}`}
-        >
-          <Zap size={14} />
-          <span>Quick</span>
-        </button>
-        <button
-          onClick={() => setActiveSubTab("architect")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeSubTab === "architect" ? "bg-zinc-800 text-white shadow-inner" : "text-zinc-500 hover:text-zinc-400"}`}
-        >
-          <PencilRuler size={14} />
-          <span>Architect</span>
-        </button>
-      </div>
+    return (
+        <div className="space-y-8 pb-40 animate-in fade-in duration-500">
 
-      {activeSubTab === "foundations" ? (
-        <div className="space-y-6">
-          <div className="px-2 flex flex-col gap-2">
-            <span className="text-[12px] font-black uppercase tracking-[0.25em] text-zinc-500">1. Design Foundation</span>
-            <div className="relative">
-              <select 
-                value={selectedPresetId}
-                onChange={(e) => onPresetChange(e.target.value)}
-                className="w-full h-16 pl-5 pr-12 bg-zinc-900 border-2 border-zinc-800 rounded-[20px] text-[16px] font-bold text-zinc-100 appearance-none focus:outline-none focus:border-primary transition-all cursor-pointer"
-              >
-                <option value="" disabled>Choose a system...</option>
-                {PRESETS.slice(1).map(p => (
-                  <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={20} />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
-          <div className="px-2 flex flex-col gap-2">
-            <span className="text-[12px] font-black uppercase tracking-[0.25em] text-zinc-500">1. System Identity</span>
-            <input 
-              type="text"
-              placeholder="e.g. Pro UI Kit"
-              value={themeName}
-              onChange={(e) => setThemeName(e.target.value)}
-              className="w-full h-16 px-5 bg-zinc-900 border-2 border-zinc-800 rounded-[20px] text-[16px] font-bold text-zinc-100 focus:outline-none focus:border-primary transition-all placeholder:text-zinc-700"
-            />
-          </div>
-          <button 
-            onClick={() => setSets([...sets, { name: "New Set", colors: [], fonts: {} }])}
-            className="w-full flex items-center justify-center gap-3 h-16 bg-zinc-900/50 border-2 border-dashed border-zinc-800 rounded-[20px] text-zinc-500 font-black text-sm uppercase tracking-widest hover:border-zinc-700 hover:text-zinc-400 transition-all"
-          >
-            <Plus size={20} />
-            <span>Add Empty Set</span>
-          </button>
-        </div>
-      )}
+            {/* ── STEP 1: Foundation ─────────────────────────────────────── */}
+            <section className="space-y-3">
+                <span className="text-[11px] font-black uppercase tracking-[0.25em] text-zinc-500 px-1">
+                    1 · Design Foundation
+                </span>
 
-      {/* Token Sets Section */}
-      {sets.length > 0 && (
-        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
-          <span className="text-[12px] font-black uppercase tracking-[0.25em] text-zinc-500 px-2">2. Token Architecture</span>
-          {sets.map((set, setIdx) => (
-            <div key={setIdx} className="bg-zinc-900 border border-zinc-800 rounded-[32px] p-6 shadow-2xl space-y-6">
-              <div className="flex justify-between items-center gap-4">
-                <input 
-                  type="text"
-                  value={set.name}
-                  onChange={(e) => {
-                    const newSets = [...sets];
-                    newSets[setIdx].name = e.target.value;
-                    setSets(newSets);
-                  }}
-                  className="bg-transparent border-none text-white font-black text-lg focus:outline-none focus:ring-0 w-full p-0"
-                />
-                <button className="p-3 bg-black/40 rounded-full text-zinc-600 hover:text-danger transition-colors"><Trash2 size={18}/></button>
-              </div>
+                <div className="flex gap-1.5 flex-wrap">
+                    {CATEGORIES.map(cat => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setCategoryFilter(cat.id)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+                                categoryFilter === cat.id
+                                    ? 'bg-primary text-white border-primary shadow-sm shadow-primary/30'
+                                    : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'
+                            }`}
+                        >
+                            {cat.label}
+                        </button>
+                    ))}
+                </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {set.colors.map((c: any, cIdx: number) => {
-                  const bgHex = set.colors.find((x:any) => x.name.toLowerCase().includes('background'))?.hex || "#ffffff";
-                  const ratio = getContrastRatio(c.hex, bgHex);
-                  const level = getWCAGLevel(ratio);
-                  return (
-                    <div key={cIdx} className="flex items-center justify-between bg-black/40 p-4 rounded-[22px] border border-zinc-800/50 group hover:border-zinc-700 transition-all">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="relative w-10 h-10 shrink-0 rounded-full border-2 border-zinc-800 group-hover:border-zinc-600 overflow-hidden transition-all">
-                          <input 
-                            type="color" 
-                            value={c.hex} 
-                            onChange={(e) => {
-                              const newSets = [...sets];
-                              newSets[setIdx].colors[cIdx].hex = e.target.value;
-                              setSets(newSets);
-                            }}
-                            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10 scale-150"
-                          />
-                          <div className="w-full h-full" style={{ backgroundColor: c.hex }}></div>
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[14px] font-bold text-zinc-200 truncate pr-2 uppercase tracking-tight">{c.name}</span>
-                          {!c.name.toLowerCase().includes('background') && (
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-2 h-2 rounded-full ${level === 'Fail' ? 'bg-danger shadow-[0_0_8px_rgba(243,18,96,0.5)]' : 'bg-success shadow-[0_0_8px_rgba(23,201,100,0.5)]'}`}></div>
-                              <span className={`text-[11px] font-black tracking-tighter ${level === 'Fail' ? 'text-danger' : 'text-success'}`}>
-                                {ratio.toFixed(1)}:1 {level}
-                              </span>
+                <div className="relative">
+                    <select
+                        value={selectedPresetId}
+                        onChange={e => onPresetChange(e.target.value)}
+                        className="w-full h-16 pl-5 pr-12 bg-zinc-900 border-2 border-zinc-800 rounded-[20px] text-[15px] font-bold text-zinc-100 appearance-none focus:outline-none focus:border-primary transition-all cursor-pointer"
+                    >
+                        <option value="" disabled>Choose a system…</option>
+                        {filteredPresets.map(p => (
+                            <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
+                        ))}
+                    </select>
+                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={18} />
+                </div>
+
+                {preset && (
+                    <p className="text-[11px] text-zinc-500 px-1 leading-relaxed animate-in fade-in duration-300">
+                        {preset.description}
+                    </p>
+                )}
+            </section>
+
+            {/* ── STEP 2: Configure ──────────────────────────────────────── */}
+            {preset && draft && (
+                <section className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                    <span className="text-[11px] font-black uppercase tracking-[0.25em] text-zinc-500 px-1">
+                        2 · Configure
+                    </span>
+
+                    {/* Theme name */}
+                    <input
+                        type="text"
+                        placeholder="Theme name"
+                        value={themeName}
+                        onChange={e => setThemeName(e.target.value)}
+                        className="w-full h-12 px-5 bg-zinc-900 border-2 border-zinc-800 rounded-[16px] text-[14px] font-bold text-zinc-100 focus:outline-none focus:border-primary transition-all placeholder:text-zinc-700"
+                    />
+
+                    {/* Shared font datalist */}
+                    <datalist id="font-list">
+                        {availableFonts.map(f => <option key={f} value={f} />)}
+                    </datalist>
+
+                    {/* ── Fonts ─────────────────────────────────────────── */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-[24px] p-5 space-y-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Font System</span>
+                        {(['heading', 'body', 'mono'] as const).map(key => (
+                            <div key={key} className="flex items-center gap-3">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 w-14 shrink-0">{key}</span>
+                                <input
+                                    type="text"
+                                    list="font-list"
+                                    value={draft.fonts[key]}
+                                    onChange={e => updateFont(key, e.target.value)}
+                                    className={`flex-1 h-9 px-3 text-[12px] font-semibold ${inputCls}`}
+                                    placeholder={`${key} font name`}
+                                />
                             </div>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-mono text-zinc-600 font-bold px-2">{c.hex.toUpperCase()}</span>
+                        ))}
+                        {availableFonts.length === 0 && (
+                            <p className="text-[10px] text-zinc-600">Type any font name or open a Penpot file to load available fonts.</p>
+                        )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      {/* Global Config */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-[32px] p-6 shadow-2xl space-y-6">
-        <span className="text-[12px] font-black uppercase tracking-[0.25em] text-zinc-500 px-1">3. Global Parameters</span>
-        <div className="flex flex-col gap-5">
-          <div className="space-y-2">
-            <span className="text-[11px] font-bold text-zinc-600 uppercase ml-2 tracking-widest">UI Density</span>
-            <div className="relative">
-              <select 
-                value={density}
-                onChange={(e) => setDensity(e.target.value)}
-                className="w-full h-14 pl-5 pr-12 bg-black/40 border-2 border-zinc-800 rounded-2xl text-[16px] font-bold text-zinc-300 focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer"
-              >
-                <option value="0.75">Compact (Tight)</option>
-                <option value="1.0">Default (Balanced)</option>
-                <option value="1.25">Comfortable (Spacious)</option>
-              </select>
-              <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" size={18} />
-            </div>
-          </div>
-        </div>
-      </div>
+                    {/* ── Colors ────────────────────────────────────────── */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-[24px] p-5 space-y-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                            Color Palette · {draft.colors.length}
+                        </span>
 
-      {/* Sticky Bottom Action */}
-      <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black via-black to-transparent z-40">
-        <button 
-          onClick={deploy}
-          disabled={!selectedPresetId && activeSubTab === 'foundations'}
-          className="w-full h-16 bg-primary text-white font-black text-[16px] uppercase tracking-[0.25em] rounded-full shadow-[0_15px_50px_-10px_rgba(0,111,238,0.6)] active:scale-[0.97] disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:shadow-none transition-all flex items-center justify-center gap-4"
-        >
-          <Sparkles size={22} />
-          <span>Generate Design System</span>
-        </button>
-      </div>
-    </div>
-  );
+                        <div className="space-y-2">
+                            {draft.colors.map((c, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                    {/* Native color picker */}
+                                    <input
+                                        type="color"
+                                        value={toHex6(c.hex)}
+                                        onChange={e => updateColor(i, 'hex', e.target.value)}
+                                        className="w-8 h-8 rounded-lg border border-zinc-700 cursor-pointer p-0.5 bg-transparent shrink-0"
+                                        title="Pick color"
+                                    />
+                                    {/* Hex text */}
+                                    <input
+                                        type="text"
+                                        value={c.hex}
+                                        onChange={e => updateColor(i, 'hex', e.target.value)}
+                                        className={`w-[76px] h-8 px-2 text-[10px] font-mono shrink-0 ${inputCls}`}
+                                        placeholder="#000000"
+                                    />
+                                    {/* Name */}
+                                    <input
+                                        type="text"
+                                        value={c.name}
+                                        onChange={e => updateColor(i, 'name', e.target.value)}
+                                        className={`flex-1 min-w-0 h-8 px-2 text-[11px] font-semibold ${inputCls}`}
+                                        placeholder="Name"
+                                    />
+                                    {/* Role */}
+                                    <div className="relative shrink-0">
+                                        <select
+                                            value={c.role}
+                                            onChange={e => updateColor(i, 'role', e.target.value)}
+                                            className={`h-8 pl-2 pr-5 text-[10px] font-bold appearance-none cursor-pointer shrink-0 ${inputCls}`}
+                                            style={{ width: '78px' }}
+                                        >
+                                            {COLOR_ROLES.map(r => (
+                                                <option key={r} value={r}>{r}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={9} />
+                                    </div>
+                                    {/* Delete */}
+                                    <button
+                                        onClick={() => removeColor(i)}
+                                        className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={addColor}
+                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:text-zinc-300 transition-all"
+                        >
+                            <Plus size={12} /> Add Color
+                        </button>
+                    </div>
+
+                    {/* ── Type Scale ────────────────────────────────────── */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-[24px] p-5 space-y-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                            Type Scale · {draft.typeRoles.length} roles
+                        </span>
+
+                        <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-0.5">
+                            {draft.typeRoles.map((r, i) => (
+                                <div key={i} className="space-y-1.5 bg-black/30 rounded-xl p-2.5 border border-zinc-800/50">
+                                    {/* Row 1: path prefix + path input + delete */}
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[9px] font-mono text-zinc-600 shrink-0">type/</span>
+                                        <input
+                                            type="text"
+                                            value={r.path}
+                                            onChange={e => updateTypeRole(i, 'path', e.target.value)}
+                                            className={`flex-1 h-7 px-2 text-[11px] font-mono ${inputCls}`}
+                                            placeholder="body/md"
+                                        />
+                                        <button
+                                            onClick={() => removeTypeRole(i)}
+                                            className="shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                        >
+                                            <Trash2 size={11} />
+                                        </button>
+                                    </div>
+                                    {/* Row 2: size · weight · family · lineHeight · letterSpacing */}
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={r.size}
+                                            onChange={e => updateTypeRole(i, 'size', parseInt(e.target.value) || 14)}
+                                            className={`w-11 h-6 px-1 text-[10px] font-mono text-center ${inputCls}`}
+                                            title="Size px"
+                                            min={6} max={200}
+                                        />
+                                        <div className="relative">
+                                            <select
+                                                value={r.weight}
+                                                onChange={e => updateTypeRole(i, 'weight', e.target.value)}
+                                                className={`h-6 pl-1.5 pr-4 text-[10px] font-mono appearance-none cursor-pointer ${inputCls}`}
+                                                style={{ width: '52px' }}
+                                                title="Weight"
+                                            >
+                                                {FONT_WEIGHTS.map(w => (
+                                                    <option key={w} value={w}>{w}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="absolute right-0.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={8} />
+                                        </div>
+                                        <div className="relative">
+                                            <select
+                                                value={r.family}
+                                                onChange={e => updateTypeRole(i, 'family', e.target.value as FontFamily)}
+                                                className={`h-6 pl-1.5 pr-4 text-[10px] font-mono appearance-none cursor-pointer ${inputCls}`}
+                                                style={{ width: '60px' }}
+                                                title="Font family"
+                                            >
+                                                {FONT_FAMILIES.map(f => (
+                                                    <option key={f} value={f}>{f}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="absolute right-0.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={8} />
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={r.lineHeight}
+                                            onChange={e => updateTypeRole(i, 'lineHeight', parseFloat(e.target.value) || 1.5)}
+                                            className={`w-12 h-6 px-1 text-[10px] font-mono text-center ${inputCls}`}
+                                            title="Line height"
+                                            step={0.05} min={0.5} max={4}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={r.letterSpacing}
+                                            onChange={e => updateTypeRole(i, 'letterSpacing', e.target.value)}
+                                            className={`flex-1 min-w-0 h-6 px-1.5 text-[10px] font-mono ${inputCls}`}
+                                            title="Letter spacing"
+                                            placeholder="0em"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={addTypeRole}
+                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:text-zinc-300 transition-all"
+                        >
+                            <Plus size={12} /> Add Role
+                        </button>
+                    </div>
+
+                    {/* ── Density ───────────────────────────────────────── */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-[24px] p-5 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Density</span>
+                            <span className="text-[11px] font-black text-primary">{DENSITY_LABELS[density] ?? `${density}×`}</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0.75" max="1.5" step="0.25"
+                            value={density}
+                            onChange={e => setDensity(e.target.value)}
+                            className="w-full accent-primary"
+                        />
+                        <div className="flex justify-between text-[9px] text-zinc-700 font-black uppercase tracking-widest">
+                            <span>Compact</span><span>Default</span><span>Comfortable</span><span>Spacious</span>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ── STEP 3: Deploy ─────────────────────────────────────────── */}
+            <button
+                onClick={deploy}
+                disabled={!preset || !draft || isDeploying}
+                className={`w-full h-16 rounded-[20px] font-black text-[13px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${
+                    !preset
+                        ? 'bg-zinc-900 border-2 border-dashed border-zinc-800 text-zinc-700 cursor-not-allowed'
+                        : isDeploying
+                        ? 'bg-primary/20 border-2 border-primary/40 text-primary/60 cursor-wait'
+                        : 'bg-primary border-2 border-primary text-white shadow-lg shadow-primary/30 hover:scale-[1.02] hover:shadow-primary/50 active:scale-[0.99]'
+                }`}
+            >
+                {isDeploying
+                    ? <><RefreshCw size={18} className="animate-spin" /> Deploying…</>
+                    : <><Zap size={18} /> Deploy System</>
+                }
+            </button>
+
+            {preset && draft && (
+                <p className="text-center text-[10px] text-zinc-600 -mt-4">
+                    4 token sets · {draft.colors.length} color palettes · {draft.typeRoles.length} type roles
+                </p>
+            )}
+        </div>
+    );
 }

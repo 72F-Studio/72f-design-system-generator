@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --mode plugin"
+    "build": "vite build && vite build --mode plugin && cp manifest.json dist/manifest.json",
+    "start": "npm run build && npx vite preview --port 4173 --host"
   },
   "dependencies": {
     "lucide-react": "^0.300.0",

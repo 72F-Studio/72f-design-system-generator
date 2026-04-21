@@ -1,387 +1,935 @@
-// src/presets/data.ts - Unit Two Data v217 (Accessibility Refined)
+// src/presets/data.ts — 72F Design System Generator v2.0
+// 17 real-world design systems with accurate fonts, type scales, colors, and spacing.
 
-export interface TypographyRole {
-    name: string;
-    size: number;
-    weight: string;
-    category: 'heading' | 'body' | 'mono' | 'ui';
-}
+import type { Preset } from './types';
+export type { Preset } from './types';
 
-export interface PresetDefaults {
-    fonts: {
-        heading: string;
-        body: string;
-        mono: string;
-    };
-    colors: { name: string; hex: string }[];
-}
-
-export interface ShadowDef {
-    name: string;
-    x: number;
-    y: number;
-    blur: number;
-    spread: number;
-    opacity: number;
-}
-
-export interface Preset {
-    id: string;
-    name: string;
-    icon: string;
-    description: string;
-    category: 'enterprise' | 'web' | 'mobile' | 'modern';
-    typography: {
-        roles: TypographyRole[];
-    };
-    defaults: PresetDefaults;
-    spacing: number[];
-    radii: { name: string; value: number }[];
-    shadows: ShadowDef[];
-    borderWidths?: { name: string; value: number }[];
-    opacities?: { name: string; value: number }[];
-}
+// Default mono fallback chain (all available on Google Fonts)
+const MONO_FALLBACKS = ['JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Roboto Mono'];
 
 export const PRESETS: Preset[] = [
+    // ── MATERIAL DESIGN 3 ─────────────────────────────────────────────────────
     {
-        id: "custom-empty",
-        name: "Custom / Start from Scratch",
-        icon: "🎨",
-        description: "Define your own scales, typography, and colors from zero.",
-        category: 'modern',
-        typography: {
-            roles: [
-                { name: "Display", size: 48, weight: "700", category: "heading" },
-                { name: "Heading", size: 32, weight: "600", category: "heading" },
-                { name: "Body", size: 16, weight: "400", category: "body" },
-                { name: "Caption", size: 12, weight: "400", category: "body" }
-            ]
-        },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "Inter" },
-            colors: [
-                { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#000000" },
-                { name: "Primary", hex: "#2563EB" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
-        radii: [ { name: "None", value: 0 }, { name: "Small", value: 4 }, { name: "Medium", value: 8 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Default", x: 0, y: 2, blur: 4, spread: 0, opacity: 0.1 } ]
-    },
-    {
-        id: "material-3",
-        name: "Material Design 3",
-        icon: "🤖",
-        description: "Google's expressive system with tonal palettes.",
+        id: 'material-3',
+        name: 'Material Design 3',
+        icon: '🤖',
+        description: "Google's expressive system with dynamic tonal palettes.",
         category: 'mobile',
-        typography: {
-            roles: [
-                { name: "Display/Large", size: 57, weight: "400", category: "heading" },
-                { name: "Headline/Medium", size: 28, weight: "400", category: "heading" },
-                { name: "Title/Medium", size: 16, weight: "500", category: "heading" },
-                { name: "Label/Medium", size: 12, weight: "500", category: "ui" },
-                { name: "Body/Large", size: 16, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Google Sans',
+            body: 'Roboto',
+            mono: 'Roboto Mono',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Roboto", body: "Roboto", mono: "Roboto Mono" },
-            colors: [
-                { name: "Primary", hex: "#6750A4" }, { name: "Secondary", hex: "#625B71" },
-                { name: "Background", hex: "#FFFBFE" }, { name: "Foreground", hex: "#1C1B1F" },
-                { name: "Success", hex: "#1D6D1F" }, { name: "Warning", hex: "#8F4E00" },
-                { name: "Error", hex: "#B3261E" }, { name: "Info", hex: "#00639B" }
-            ]
-        },
+        colors: [
+            { name: 'Primary',    hex: '#6750A4', role: 'primary' },
+            { name: 'Secondary',  hex: '#625B71', role: 'secondary' },
+            { name: 'Tertiary',   hex: '#7D5260', role: 'tertiary' },
+            { name: 'Neutral',    hex: '#605D62', role: 'neutral' },
+            { name: 'Error',      hex: '#B3261E', role: 'error' },
+            { name: 'Success',    hex: '#1D6D1F', role: 'success' },
+            { name: 'Warning',    hex: '#8F4E00', role: 'warning' },
+            { name: 'Info',       hex: '#00639B', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 57, weight: '400', lineHeight: 1.12, letterSpacing: '-0.025em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 45, weight: '400', lineHeight: 1.16, letterSpacing: '0em',      family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 36, weight: '400', lineHeight: 1.22, letterSpacing: '0em',      family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 32, weight: '400', lineHeight: 1.25, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 28, weight: '400', lineHeight: 1.29, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 24, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h4',   size: 22, weight: '400', lineHeight: 1.27, letterSpacing: '0em',      family: 'body',    group: 'heading' },
+            { path: 'heading/h5',   size: 16, weight: '500', lineHeight: 1.50, letterSpacing: '0.009em',  family: 'body',    group: 'heading' },
+            { path: 'heading/h6',   size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '0.007em',  family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0.031em',  family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0.018em',  family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0.025em',  family: 'body',    group: 'body' },
+            { path: 'label/lg',     size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '0.007em',  family: 'body',    group: 'label' },
+            { path: 'label/md',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0.042em',  family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 11, weight: '500', lineHeight: 1.45, letterSpacing: '0.045em',  family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0.033em',  family: 'body',    group: 'caption' },
+        ],
         spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
         radii: [
-            { name: "None", value: 0 }, { name: "XS", value: 4 }, { name: "SM", value: 8 },
-            { name: "MD", value: 12 }, { name: "LG", value: 16 }, { name: "Full", value: 9999 }
+            { name: 'none',   value: 0 },
+            { name: 'xs',     value: 4 },
+            { name: 'sm',     value: 8 },
+            { name: 'md',     value: 12 },
+            { name: 'lg',     value: 16 },
+            { name: 'xl',     value: 28 },
+            { name: 'full',   value: 9999 },
         ],
         shadows: [
-            { name: "Level 1", x: 0, y: 1, blur: 3, spread: 1, opacity: 0.15 },
-            { name: "Level 2", x: 0, y: 2, blur: 6, spread: 2, opacity: 0.15 }
-        ]
+            { name: 'elevation-1', x: 0, y: 1, blur: 2,  spread: 0, opacity: 0.30 },
+            { name: 'elevation-2', x: 0, y: 2, blur: 6,  spread: 0, opacity: 0.25 },
+            { name: 'elevation-3', x: 0, y: 4, blur: 8,  spread: 0, opacity: 0.20 },
+            { name: 'elevation-4', x: 0, y: 6, blur: 10, spread: 0, opacity: 0.18 },
+            { name: 'elevation-5', x: 0, y: 8, blur: 12, spread: 0, opacity: 0.16 },
+        ],
     },
+
+    // ── APPLE HIG ─────────────────────────────────────────────────────────────
     {
-        id: "apple-hig",
-        name: "Apple HIG",
-        icon: "🍎",
-        description: "The adaptive standard for iOS/macOS.",
+        id: 'apple-hig',
+        name: 'Apple HIG',
+        icon: '🍎',
+        description: 'Adaptive typeface system for iOS, macOS, and beyond.',
         category: 'mobile',
-        typography: {
-            roles: [
-                { name: "Large Title", size: 34, weight: "400", category: "heading" },
-                { name: "Headline", size: 17, weight: "600", category: "heading" },
-                { name: "Body", size: 17, weight: "400", category: "body" },
-                { name: "Caption", size: 12, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'SF Pro Display',
+            body: 'SF Pro Text',
+            mono: 'SF Mono',
+            monoFallbacks: ['JetBrains Mono', 'Fira Code', 'Roboto Mono'],
         },
-        defaults: {
-            fonts: { heading: "SF Pro Display", body: "SF Pro Text", mono: "SF Mono" },
-            colors: [
-                { name: "Primary", hex: "#0071FF" }, { name: "Secondary", hex: "#5856D6" },
-                { name: "Background", hex: "#FFFFFF" }, { name: "Foreground", hex: "#000000" },
-                { name: "Success", hex: "#248A3D" }, { name: "Error", hex: "#FF3B30" },
-                { name: "Warning", hex: "#C97B00" }, { name: "Info", hex: "#0071E3" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 20, 32, 40],
-        radii: [ { name: "SM", value: 6 }, { name: "MD", value: 10 }, { name: "LG", value: 20 } ],
-        shadows: [ { name: "Standard", x: 0, y: 2, blur: 10, spread: 0, opacity: 0.1 } ]
+        colors: [
+            { name: 'Blue',    hex: '#0071E3', role: 'primary' },
+            { name: 'Purple',  hex: '#5856D6', role: 'secondary' },
+            { name: 'Neutral', hex: '#6E6E73', role: 'neutral' },
+            { name: 'Green',   hex: '#248A3D', role: 'success' },
+            { name: 'Red',     hex: '#FF3B30', role: 'error' },
+            { name: 'Orange',  hex: '#C97B00', role: 'warning' },
+            { name: 'Teal',    hex: '#0071E3', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 34, weight: '400', lineHeight: 1.21, letterSpacing: '-0.003em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 28, weight: '400', lineHeight: 1.25, letterSpacing: '-0.003em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 22, weight: '400', lineHeight: 1.27, letterSpacing: '-0.003em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 20, weight: '600', lineHeight: 1.30, letterSpacing: '-0.002em', family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 17, weight: '600', lineHeight: 1.29, letterSpacing: '-0.001em', family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 17, weight: '400', lineHeight: 1.47, letterSpacing: '-0.001em', family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '-0.001em', family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 15, weight: '400', lineHeight: 1.47, letterSpacing: '-0.001em', family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 13, weight: '400', lineHeight: 1.38, letterSpacing: '-0.001em', family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+            { path: 'caption/sm',   size: 11, weight: '400', lineHeight: 1.36, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 32, 40, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 6 },
+            { name: 'md',     value: 10 },
+            { name: 'lg',     value: 14 },
+            { name: 'xl',     value: 20 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 4,  spread: 0, opacity: 0.12 },
+            { name: 'md',    x: 0, y: 4,  blur: 16, spread: 0, opacity: 0.12 },
+            { name: 'lg',    x: 0, y: 8,  blur: 24, spread: 0, opacity: 0.12 },
+            { name: 'focus', x: 0, y: 0,  blur: 0,  spread: 4, opacity: 0.35 },
+        ],
     },
+
+    // ── IBM CARBON ────────────────────────────────────────────────────────────
     {
-        id: "shopify-polaris",
-        name: "Shopify Polaris",
-        icon: "🛍️",
-        description: "Merchant-focused system for e-commerce.",
+        id: 'ibm-carbon',
+        name: 'IBM Carbon',
+        icon: '🔷',
+        description: "IBM's open-source design system for enterprise products.",
         category: 'enterprise',
-        typography: {
-            roles: [
-                { name: "Display/LG", size: 24, weight: "600", category: "heading" },
-                { name: "Heading/MD", size: 20, weight: "600", category: "heading" },
-                { name: "Body/MD", size: 16, weight: "400", category: "body" },
-                { name: "Caption", size: 12, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'IBM Plex Sans',
+            body: 'IBM Plex Sans',
+            mono: 'IBM Plex Mono',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "JetBrains Mono" },
-            colors: [
-                { name: "Primary", hex: "#008060" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#202223" }, { name: "Success", hex: "#008060" },
-                { name: "Error", hex: "#D82C0D" }, { name: "Warning", hex: "#916A00" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 20, 24, 32],
-        radii: [ { name: "XS", value: 2 }, { name: "SM", value: 4 }, { name: "MD", value: 8 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Shadow 1", x: 0, y: 2, blur: 1, spread: -1, opacity: 0.2 } ]
+        colors: [
+            { name: 'Blue',    hex: '#0F62FE', role: 'primary' },
+            { name: 'Cyan',    hex: '#0072C3', role: 'secondary' },
+            { name: 'Gray',    hex: '#525252', role: 'neutral' },
+            { name: 'Green',   hex: '#198038', role: 'success' },
+            { name: 'Red',     hex: '#DA1E28', role: 'error' },
+            { name: 'Yellow',  hex: '#9B7204', role: 'warning' },
+            { name: 'Teal',    hex: '#007D79', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 54, weight: '300', lineHeight: 1.19, letterSpacing: '-0.023em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 42, weight: '300', lineHeight: 1.19, letterSpacing: '-0.020em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 32, weight: '400', lineHeight: 1.25, letterSpacing: '-0.016em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 28, weight: '400', lineHeight: 1.29, letterSpacing: '-0.012em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 20, weight: '400', lineHeight: 1.40, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 16, weight: '600', lineHeight: 1.375, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'heading/h4',   size: 14, weight: '600', lineHeight: 1.29, letterSpacing: '0em',      family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0.016em',  family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0.032em',  family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.29, letterSpacing: '0.016em',  family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0.032em',  family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'code/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0.032em',  family: 'body',    group: 'caption' },
+        ],
+        spacing: [2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 2 },
+            { name: 'md',     value: 4 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm', x: 0, y: 2,  blur: 6,  spread: 0, opacity: 0.20 },
+            { name: 'md', x: 0, y: 4,  blur: 8,  spread: 0, opacity: 0.20 },
+            { name: 'lg', x: 0, y: 6,  blur: 12, spread: 0, opacity: 0.20 },
+            { name: 'xl', x: 0, y: 8,  blur: 24, spread: 0, opacity: 0.20 },
+        ],
     },
+
+    // ── MICROSOFT FLUENT 2 ────────────────────────────────────────────────────
     {
-        id: "untitled-ui",
-        name: "Untitled UI",
-        icon: "✨",
-        description: "Modern, clean, and highly flexible Figma standard.",
-        category: 'modern',
-        typography: {
-            roles: [
-                { name: "Display/MD", size: 48, weight: "700", category: "heading" },
-                { name: "Heading/LG", size: 30, weight: "600", category: "heading" },
-                { name: "Body/MD", size: 16, weight: "400", category: "body" },
-                { name: "Body/SM", size: 14, weight: "400", category: "body" }
-            ]
-        },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "Fira Code" },
-            colors: [
-                { name: "Primary", hex: "#7C3AED" }, { name: "Gray", hex: "#475467" },
-                { name: "Background", hex: "#FFFFFF" }, { name: "Foreground", hex: "#101828" },
-                { name: "Success", hex: "#079455" }, { name: "Error", hex: "#D92D20" },
-                { name: "Warning", hex: "#B54708" }, { name: "Info", hex: "#1570EF" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 24, 32, 48],
-        radii: [ { name: "SM", value: 4 }, { name: "MD", value: 8 }, { name: "LG", value: 12 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Shadow MD", x: 0, y: 4, blur: 8, spread: -2, opacity: 0.1 } ]
-    },
-    {
-        id: "atlassian",
-        name: "Atlassian",
-        icon: "🟦",
-        description: "Enterprise-grade collaboration system.",
+        id: 'microsoft-fluent',
+        name: 'Microsoft Fluent',
+        icon: '🪟',
+        description: 'Adaptive design language for Windows and Microsoft 365.',
         category: 'enterprise',
-        typography: {
-            roles: [
-                { name: "Heading/XL", size: 29, weight: "600", category: "heading" },
-                { name: "Heading/MD", size: 20, weight: "600", category: "heading" },
-                { name: "Body/Default", size: 14, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Segoe UI Variable',
+            body: 'Segoe UI Variable',
+            mono: 'Cascadia Code',
+            monoFallbacks: ['Fira Code', 'JetBrains Mono', 'Roboto Mono'],
         },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "SF Mono" },
-            colors: [
-                { name: "Primary", hex: "#0052CC" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#172B4D" }, { name: "Success", hex: "#1D7F4D" },
-                { name: "Error", hex: "#D7371F" }, { name: "Warning", hex: "#974F0C" },
-                { name: "Info", hex: "#0052CC" }
-            ]
-        },
-        spacing: [0, 2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80],
-        radii: [ { name: "SM", value: 3 }, { name: "MD", value: 6 }, { name: "LG", value: 10 } ],
-        shadows: [ { name: "Raised", x: 0, y: 2, blur: 4, spread: 0, opacity: 0.1 } ]
+        colors: [
+            { name: 'Brand',   hex: '#0078D4', role: 'primary' },
+            { name: 'Berry',   hex: '#8764B8', role: 'secondary' },
+            { name: 'Neutral', hex: '#616161', role: 'neutral' },
+            { name: 'Green',   hex: '#107C10', role: 'success' },
+            { name: 'Red',     hex: '#A4262C', role: 'error' },
+            { name: 'Yellow',  hex: '#9F6B00', role: 'warning' },
+            { name: 'Teal',    hex: '#038387', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 68, weight: '600', lineHeight: 1.18, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 52, weight: '600', lineHeight: 1.23, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 40, weight: '600', lineHeight: 1.30, letterSpacing: '-0.01em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 32, weight: '600', lineHeight: 1.25, letterSpacing: '-0.01em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 24, weight: '600', lineHeight: 1.33, letterSpacing: '-0.01em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 20, weight: '600', lineHeight: 1.40, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h4',   size: 18, weight: '600', lineHeight: 1.44, letterSpacing: '0em',      family: 'body',    group: 'heading' },
+            { path: 'heading/h5',   size: 16, weight: '600', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '600', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '600', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+            { path: 'overline/md',  size: 11, weight: '600', lineHeight: 1.45, letterSpacing: '0.08em',   family: 'body',    group: 'overline' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 2 },
+            { name: 'md',     value: 4 },
+            { name: 'lg',     value: 8 },
+            { name: 'xl',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 2,  blur: 4,  spread: 0,  opacity: 0.14 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0,  opacity: 0.14 },
+            { name: 'lg',    x: 0, y: 8,  blur: 16, spread: 0,  opacity: 0.14 },
+            { name: 'xl',    x: 0, y: 16, blur: 32, spread: 0,  opacity: 0.14 },
+        ],
     },
+
+    // ── SHOPIFY POLARIS ───────────────────────────────────────────────────────
     {
-        id: "microsoft-fluent",
-        name: "Microsoft Fluent",
-        icon: "🪟",
-        description: "Adaptive design for Windows and beyond.",
-        category: 'web',
-        typography: {
-            roles: [
-                { name: "Title/Large", size: 40, weight: "600", category: "heading" },
-                { name: "Subtitle/MD", size: 20, weight: "600", category: "heading" },
-                { name: "Body/MD", size: 14, weight: "400", category: "body" }
-            ]
+        id: 'shopify-polaris',
+        name: 'Shopify Polaris',
+        icon: '🛍️',
+        description: 'Merchant-focused design system for e-commerce.',
+        category: 'enterprise',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'JetBrains Mono',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Segoe UI", body: "Segoe UI", mono: "Cascadia Code" },
-            colors: [
-                { name: "Brand", hex: "#0078D4" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#242424" }, { name: "Success", hex: "#107C10" },
-                { name: "Error", hex: "#A4262C" }, { name: "Warning", hex: "#9F6B00" }
-            ]
-        },
+        colors: [
+            { name: 'Green',   hex: '#008060', role: 'primary' },
+            { name: 'Teal',    hex: '#00848E', role: 'secondary' },
+            { name: 'Gray',    hex: '#6D7175', role: 'neutral' },
+            { name: 'Success', hex: '#008060', role: 'success' },
+            { name: 'Red',     hex: '#D82C0D', role: 'error' },
+            { name: 'Yellow',  hex: '#916A00', role: 'warning' },
+            { name: 'Blue',    hex: '#0070F0', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 24, weight: '600', lineHeight: 1.33, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 20, weight: '600', lineHeight: 1.40, letterSpacing: '-0.01em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 17, weight: '600', lineHeight: 1.41, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 15, weight: '600', lineHeight: 1.40, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 15, weight: '400', lineHeight: 1.47, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 13, weight: '400', lineHeight: 1.38, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 13, weight: '500', lineHeight: 1.38, letterSpacing: '0em',     family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0.017em', family: 'body',    group: 'caption' },
+        ],
         spacing: [0, 4, 8, 12, 16, 20, 24, 32, 40],
-        radii: [ { name: "SM", value: 2 }, { name: "MD", value: 4 }, { name: "LG", value: 6 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Shadow 8", x: 0, y: 4, blur: 8, spread: 0, opacity: 0.14 } ]
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'xs',     value: 2 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 8 },
+            { name: 'lg',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1, blur: 1,  spread: -1, opacity: 0.20 },
+            { name: 'md',    x: 0, y: 2, blur: 4,  spread: -1, opacity: 0.16 },
+            { name: 'lg',    x: 0, y: 4, blur: 8,  spread: -1, opacity: 0.14 },
+        ],
     },
+
+    // ── GITHUB PRIMER ─────────────────────────────────────────────────────────
     {
-        id: "github-primer",
-        name: "GitHub Primer",
-        icon: "🐙",
-        description: "The system powering the world's code.",
+        id: 'github-primer',
+        name: 'GitHub Primer',
+        icon: '🐙',
+        description: 'The design system powering GitHub.',
         category: 'web',
-        typography: {
-            roles: [
-                { name: "Display/MD", size: 32, weight: "600", category: "heading" },
-                { name: "Title/MD", size: 20, weight: "600", category: "heading" },
-                { name: "Body/MD", size: 14, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Fira Code',
+            monoFallbacks: ['JetBrains Mono', 'Source Code Pro', 'Roboto Mono'],
         },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "SFMono-Regular" },
-            colors: [
-                { name: "Accent", hex: "#0969DA" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#1F2328" }, { name: "Success", hex: "#1A7F37" },
-                { name: "Error", hex: "#D1242F" }, { name: "Warning", hex: "#9A6700" }
-            ]
-        },
-        spacing: [0, 4, 8, 16, 24, 32, 40, 48],
-        radii: [ { name: "SM", value: 3 }, { name: "MD", value: 6 }, { name: "LG", value: 12 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Medium", x: 0, y: 3, blur: 6, spread: 0, opacity: 0.15 } ]
+        colors: [
+            { name: 'Blue',    hex: '#0969DA', role: 'primary' },
+            { name: 'Purple',  hex: '#8250DF', role: 'secondary' },
+            { name: 'Gray',    hex: '#57606A', role: 'neutral' },
+            { name: 'Green',   hex: '#1A7F37', role: 'success' },
+            { name: 'Red',     hex: '#CF222E', role: 'error' },
+            { name: 'Yellow',  hex: '#9A6700', role: 'warning' },
+            { name: 'Teal',    hex: '#0969DA', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 40, weight: '600', lineHeight: 1.25, letterSpacing: '-0.02em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 32, weight: '600', lineHeight: 1.25, letterSpacing: '-0.02em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 26, weight: '600', lineHeight: 1.23, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 22, weight: '600', lineHeight: 1.27, letterSpacing: '-0.01em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 18, weight: '600', lineHeight: 1.33, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 16, weight: '600', lineHeight: 1.25, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 12, weight: '600', lineHeight: 1.33, letterSpacing: '0.025em', family: 'body',    group: 'label' },
+            { path: 'code/lg',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'code/md',      size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',     family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 16, 24, 32, 40, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 3 },
+            { name: 'md',     value: 6 },
+            { name: 'lg',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 3,  spread: 0,  opacity: 0.12 },
+            { name: 'md',    x: 0, y: 3,  blur: 6,  spread: 0,  opacity: 0.15 },
+            { name: 'lg',    x: 0, y: 8,  blur: 24, spread: 0,  opacity: 0.12 },
+            { name: 'xl',    x: 0, y: 12, blur: 28, spread: 0,  opacity: 0.12 },
+        ],
     },
+
+    // ── ATLASSIAN DESIGN SYSTEM ────────────────────────────────────────────────
     {
-        id: "salesforce-lightning",
-        name: "Salesforce Lightning",
-        icon: "⚡",
-        description: "The standard for enterprise CRM experiences.",
+        id: 'atlassian',
+        name: 'Atlassian Design',
+        icon: '🟦',
+        description: 'Enterprise-grade system for Jira, Confluence, and beyond.',
         category: 'enterprise',
-        typography: {
-            roles: [
-                { name: "Heading/LG", size: 32, weight: "400", category: "heading" },
-                { name: "Heading/MD", size: 20, weight: "400", category: "heading" },
-                { name: "Body/MD", size: 14, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'JetBrains Mono',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Salesforce Sans", body: "Salesforce Sans", mono: "Monaco" },
-            colors: [
-                { name: "Brand", hex: "#0176D3" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#181818" }, { name: "Success", hex: "#2E844A" },
-                { name: "Error", hex: "#EA001E" }, { name: "Warning", hex: "#8B5C00" }
-            ]
-        },
-        spacing: [0, 2, 4, 8, 12, 16, 20, 24, 32, 48],
-        radii: [ { name: "SM", value: 2 }, { name: "MD", value: 4 }, { name: "LG", value: 8 } ],
-        shadows: [ { name: "Low", x: 0, y: 2, blur: 2, spread: 0, opacity: 0.1 } ]
+        colors: [
+            { name: 'Blue',    hex: '#0052CC', role: 'primary' },
+            { name: 'Teal',    hex: '#00B8D9', role: 'secondary' },
+            { name: 'Gray',    hex: '#5E6C84', role: 'neutral' },
+            { name: 'Green',   hex: '#00875A', role: 'success' },
+            { name: 'Red',     hex: '#DE350B', role: 'error' },
+            { name: 'Yellow',  hex: '#974F0C', role: 'warning' },
+            { name: 'Cyan',    hex: '#0065FF', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 35, weight: '600', lineHeight: 1.14, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 29, weight: '600', lineHeight: 1.17, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 24, weight: '600', lineHeight: 1.25, letterSpacing: '0em',     family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 20, weight: '500', lineHeight: 1.40, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 16, weight: '600', lineHeight: 1.50, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 14, weight: '600', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0.025em', family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',     family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 3 },
+            { name: 'md',     value: 6 },
+            { name: 'lg',     value: 10 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 1,  spread: 0, opacity: 0.20 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0, opacity: 0.16 },
+            { name: 'lg',    x: 0, y: 8,  blur: 16, spread: 0, opacity: 0.14 },
+        ],
     },
+
+    // ── ANT DESIGN ────────────────────────────────────────────────────────────
     {
-        id: "adobe-spectrum",
-        name: "Adobe Spectrum",
-        icon: "🧱",
-        description: "Adaptive, accessible system for creative tools.",
+        id: 'ant-design',
+        name: 'Ant Design',
+        icon: '🐜',
+        description: "Alibaba's enterprise-level UI language.",
+        category: 'enterprise',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Source Code Pro',
+            monoFallbacks: MONO_FALLBACKS,
+        },
+        colors: [
+            { name: 'Blue',    hex: '#1677FF', role: 'primary' },
+            { name: 'Purple',  hex: '#722ED1', role: 'secondary' },
+            { name: 'Gray',    hex: '#8C8C8C', role: 'neutral' },
+            { name: 'Green',   hex: '#389E0D', role: 'success' },
+            { name: 'Red',     hex: '#CF1322', role: 'error' },
+            { name: 'Yellow',  hex: '#D48806', role: 'warning' },
+            { name: 'Cyan',    hex: '#0884A8', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 38, weight: '600', lineHeight: 1.21, letterSpacing: '-0.02em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 30, weight: '600', lineHeight: 1.27, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 24, weight: '600', lineHeight: 1.33, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 20, weight: '600', lineHeight: 1.40, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 16, weight: '600', lineHeight: 1.50, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.57, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.67, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.57, letterSpacing: '0em',     family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.67, letterSpacing: '0em',     family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.57, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.67, letterSpacing: '0em',     family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'xs',     value: 2 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 6 },
+            { name: 'lg',     value: 8 },
+            { name: 'xl',     value: 16 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 2,  spread: 0, opacity: 0.08 },
+            { name: 'md',    x: 0, y: 2,  blur: 8,  spread: 0, opacity: 0.15 },
+            { name: 'lg',    x: 0, y: 4,  blur: 16, spread: 0, opacity: 0.20 },
+            { name: 'xl',    x: 0, y: 8,  blur: 24, spread: 0, opacity: 0.20 },
+        ],
+    },
+
+    // ── SALESFORCE LIGHTNING ──────────────────────────────────────────────────
+    {
+        id: 'salesforce-lightning',
+        name: 'Salesforce Lightning',
+        icon: '⚡',
+        description: 'The standard design system for enterprise CRM.',
+        category: 'enterprise',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Roboto Mono',
+            monoFallbacks: MONO_FALLBACKS,
+        },
+        colors: [
+            { name: 'Blue',    hex: '#0176D3', role: 'primary' },
+            { name: 'Indigo',  hex: '#5867E8', role: 'secondary' },
+            { name: 'Gray',    hex: '#706E6B', role: 'neutral' },
+            { name: 'Green',   hex: '#2E844A', role: 'success' },
+            { name: 'Red',     hex: '#EA001E', role: 'error' },
+            { name: 'Yellow',  hex: '#8B5C00', role: 'warning' },
+            { name: 'Teal',    hex: '#0D7F89', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 32, weight: '400', lineHeight: 1.25, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 26, weight: '400', lineHeight: 1.31, letterSpacing: '0em',     family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 22, weight: '400', lineHeight: 1.27, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 18, weight: '400', lineHeight: 1.44, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 16, weight: '700', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 13, weight: '700', lineHeight: 1.38, letterSpacing: '0.06em',  family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'caption' },
+            { path: 'overline/md',  size: 12, weight: '700', lineHeight: 1.33, letterSpacing: '0.1em',   family: 'body',    group: 'overline' },
+        ],
+        spacing: [0, 2, 4, 8, 12, 16, 20, 24, 32, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 2 },
+            { name: 'md',     value: 4 },
+            { name: 'lg',     value: 8 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm', x: 0, y: 2, blur: 2,  spread: 0, opacity: 0.10 },
+            { name: 'md', x: 0, y: 4, blur: 8,  spread: 0, opacity: 0.10 },
+            { name: 'lg', x: 0, y: 8, blur: 16, spread: 0, opacity: 0.12 },
+        ],
+    },
+
+    // ── ADOBE SPECTRUM ────────────────────────────────────────────────────────
+    {
+        id: 'adobe-spectrum',
+        name: 'Adobe Spectrum',
+        icon: '🧱',
+        description: 'Adaptive, accessible design system for creative tools.',
         category: 'modern',
-        typography: {
-            roles: [
-                { name: "Display/LG", size: 36, weight: "700", category: "heading" },
-                { name: "Heading/MD", size: 20, weight: "700", category: "heading" },
-                { name: "Body/MD", size: 14, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Source Sans 3',
+            body: 'Source Sans 3',
+            mono: 'Source Code Pro',
+            monoFallbacks: ['Fira Code', 'JetBrains Mono', 'Roboto Mono'],
         },
-        defaults: {
-            fonts: { heading: "Adobe Clean", body: "Adobe Clean", mono: "Source Code Pro" },
-            colors: [
-                { name: "Accent", hex: "#0265DC" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#222222" }, { name: "Success", hex: "#12805C" },
-                { name: "Error", hex: "#D31510" }, { name: "Warning", hex: "#936300" }
-            ]
-        },
+        colors: [
+            { name: 'Blue',    hex: '#0265DC', role: 'primary' },
+            { name: 'Indigo',  hex: '#5C5CE0', role: 'secondary' },
+            { name: 'Gray',    hex: '#6E6E6E', role: 'neutral' },
+            { name: 'Green',   hex: '#12805C', role: 'success' },
+            { name: 'Red',     hex: '#D31510', role: 'error' },
+            { name: 'Orange',  hex: '#936300', role: 'warning' },
+            { name: 'Teal',    hex: '#0480B5', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 45, weight: '700', lineHeight: 1.22, letterSpacing: '-0.025em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.01em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 22, weight: '700', lineHeight: 1.27, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '700', lineHeight: 1.33, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h4',   size: 16, weight: '700', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '700', lineHeight: 1.29, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '700', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 11, weight: '400', lineHeight: 1.45, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
         spacing: [0, 4, 8, 16, 24, 32, 40, 48, 64, 80],
-        radii: [ { name: "SM", value: 2 }, { name: "MD", value: 4 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Shadow 100", x: 0, y: 1, blur: 4, spread: 0, opacity: 0.15 } ]
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 2 },
+            { name: 'md',     value: 4 },
+            { name: 'lg',     value: 8 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 4,  spread: 0, opacity: 0.15 },
+            { name: 'md',    x: 0, y: 2,  blur: 8,  spread: 0, opacity: 0.15 },
+            { name: 'lg',    x: 0, y: 4,  blur: 16, spread: 0, opacity: 0.15 },
+        ],
     },
+
+    // ── UNTITLED UI ───────────────────────────────────────────────────────────
     {
-        id: "uber-base",
-        name: "Uber Base",
-        icon: "🚗",
-        description: "Structured system for global movement.",
+        id: 'untitled-ui',
+        name: 'Untitled UI',
+        icon: '✨',
+        description: 'Modern, accessible, and highly flexible UI kit.',
         category: 'modern',
-        typography: {
-            roles: [
-                { name: "Display/LG", size: 44, weight: "700", category: "heading" },
-                { name: "Heading/MD", size: 24, weight: "700", category: "heading" },
-                { name: "Body/MD", size: 16, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Fira Code',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Uber Move", body: "Uber Move Text", mono: "Uber Move Mono" },
-            colors: [
-                { name: "Accent", hex: "#276EF1" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#000000" }, { name: "Success", hex: "#05A357" },
-                { name: "Error", hex: "#E11900" }, { name: "Warning", hex: "#966A00" }
-            ]
+        colors: [
+            { name: 'Violet',  hex: '#7F56D9', role: 'primary' },
+            { name: 'Indigo',  hex: '#444CE7', role: 'secondary' },
+            { name: 'Gray',    hex: '#667085', role: 'neutral' },
+            { name: 'Green',   hex: '#079455', role: 'success' },
+            { name: 'Red',     hex: '#D92D20', role: 'error' },
+            { name: 'Orange',  hex: '#B54708', role: 'warning' },
+            { name: 'Blue',    hex: '#1570EF', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/2xl',  size: 72, weight: '600', lineHeight: 1.11, letterSpacing: '-0.027em', family: 'heading', group: 'display' },
+            { path: 'display/xl',   size: 60, weight: '600', lineHeight: 1.17, letterSpacing: '-0.022em', family: 'heading', group: 'display' },
+            { path: 'display/lg',   size: 48, weight: '600', lineHeight: 1.21, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 36, weight: '600', lineHeight: 1.22, letterSpacing: '-0.018em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 30, weight: '600', lineHeight: 1.27, letterSpacing: '-0.012em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 24, weight: '600', lineHeight: 1.33, letterSpacing: '-0.008em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 20, weight: '600', lineHeight: 1.40, letterSpacing: '-0.004em', family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '600', lineHeight: 1.44, letterSpacing: '-0.004em', family: 'heading', group: 'heading' },
+            { path: 'heading/h4',   size: 16, weight: '600', lineHeight: 1.50, letterSpacing: '-0.003em', family: 'body',    group: 'heading' },
+            { path: 'body/xl',      size: 20, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/xs',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/xl',     size: 18, weight: '500', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/lg',     size: 16, weight: '500', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/xs',     size: 11, weight: '500', lineHeight: 1.45, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'code/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+            { path: 'overline/md',  size: 12, weight: '500', lineHeight: 1.50, letterSpacing: '0.08em',   family: 'body',    group: 'overline' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'xs',     value: 4 },
+            { name: 'sm',     value: 6 },
+            { name: 'md',     value: 8 },
+            { name: 'lg',     value: 12 },
+            { name: 'xl',     value: 16 },
+            { name: '2xl',    value: 20 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'xs',    x: 0, y: 1,  blur: 2,  spread: 0,  opacity: 0.05 },
+            { name: 'sm',    x: 0, y: 1,  blur: 3,  spread: 0,  opacity: 0.10 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: -2, opacity: 0.10 },
+            { name: 'lg',    x: 0, y: 12, blur: 16, spread: -4, opacity: 0.10 },
+            { name: 'xl',    x: 0, y: 20, blur: 24, spread: -4, opacity: 0.10 },
+            { name: '2xl',   x: 0, y: 24, blur: 48, spread: -12, opacity: 0.18 },
+        ],
+    },
+
+    // ── BOOTSTRAP 5 ──────────────────────────────────────────────────────────
+    {
+        id: 'bootstrap-5',
+        name: 'Bootstrap 5',
+        icon: '🅱️',
+        description: 'The most popular CSS framework, token-ready.',
+        category: 'web',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Fira Mono',
+            monoFallbacks: ['JetBrains Mono', 'Fira Code', 'Roboto Mono'],
         },
+        colors: [
+            { name: 'Blue',    hex: '#0D6EFD', role: 'primary' },
+            { name: 'Indigo',  hex: '#6610F2', role: 'secondary' },
+            { name: 'Gray',    hex: '#6C757D', role: 'neutral' },
+            { name: 'Green',   hex: '#198754', role: 'success' },
+            { name: 'Red',     hex: '#DC3545', role: 'error' },
+            { name: 'Yellow',  hex: '#926100', role: 'warning' },
+            { name: 'Cyan',    hex: '#0DCAF0', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 80, weight: '300', lineHeight: 1.20, letterSpacing: '-0.02em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 64, weight: '300', lineHeight: 1.20, letterSpacing: '-0.02em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 48, weight: '300', lineHeight: 1.25, letterSpacing: '-0.01em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 40, weight: '500', lineHeight: 1.20, letterSpacing: '-0.01em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 32, weight: '500', lineHeight: 1.20, letterSpacing: '-0.01em', family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 28, weight: '500', lineHeight: 1.20, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h4',   size: 24, weight: '500', lineHeight: 1.20, letterSpacing: '0em',     family: 'heading', group: 'heading' },
+            { path: 'heading/h5',   size: 20, weight: '500', lineHeight: 1.20, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'heading/h6',   size: 16, weight: '500', lineHeight: 1.20, letterSpacing: '0em',     family: 'body',    group: 'heading' },
+            { path: 'body/lg',      size: 20, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 16, weight: '700', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.50, letterSpacing: '0em',     family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 16, 24, 32, 40, 48, 64, 80, 96],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 6 },
+            { name: 'lg',     value: 8 },
+            { name: 'xl',     value: 16 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 2,  blur: 1,  spread: 0,  opacity: 0.075 },
+            { name: 'md',    x: 0, y: 4,  blur: 6,  spread: 0,  opacity: 0.10 },
+            { name: 'lg',    x: 0, y: 8,  blur: 10, spread: 0,  opacity: 0.15 },
+        ],
+    },
+
+    // ── STRIPE ────────────────────────────────────────────────────────────────
+    {
+        id: 'stripe',
+        name: 'Stripe',
+        icon: '💳',
+        description: "Stripe's clean, trustworthy fintech design language.",
+        category: 'modern',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Roboto Mono',
+            monoFallbacks: MONO_FALLBACKS,
+        },
+        colors: [
+            { name: 'Blurple',  hex: '#635BFF', role: 'primary' },
+            { name: 'Cyan',     hex: '#00D4FF', role: 'secondary' },
+            { name: 'Gray',     hex: '#697386', role: 'neutral' },
+            { name: 'Green',    hex: '#1A9C3E', role: 'success' },
+            { name: 'Red',      hex: '#DF1B41', role: 'error' },
+            { name: 'Yellow',   hex: '#8B6000', role: 'warning' },
+            { name: 'Blue',     hex: '#0570DE', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 60, weight: '700', lineHeight: 1.13, letterSpacing: '-0.03em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 48, weight: '700', lineHeight: 1.17, letterSpacing: '-0.025em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.015em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 22, weight: '700', lineHeight: 1.27, letterSpacing: '-0.01em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '600', lineHeight: 1.44, letterSpacing: '-0.005em', family: 'heading', group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 15, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'xs',     value: 4 },
+            { name: 'sm',     value: 6 },
+            { name: 'md',     value: 8 },
+            { name: 'lg',     value: 12 },
+            { name: 'xl',     value: 20 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 4,  spread: 0,  opacity: 0.12 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0,  opacity: 0.12 },
+            { name: 'lg',    x: 0, y: 8,  blur: 16, spread: 0,  opacity: 0.12 },
+        ],
+    },
+
+    // ── LINEAR ────────────────────────────────────────────────────────────────
+    {
+        id: 'linear',
+        name: 'Linear',
+        icon: '📐',
+        description: 'High-density, precise product design language.',
+        category: 'modern',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'JetBrains Mono',
+            monoFallbacks: MONO_FALLBACKS,
+        },
+        colors: [
+            { name: 'Violet',  hex: '#5E6AD2', role: 'primary' },
+            { name: 'Purple',  hex: '#8B5CF6', role: 'secondary' },
+            { name: 'Gray',    hex: '#6B7280', role: 'neutral' },
+            { name: 'Green',   hex: '#16A34A', role: 'success' },
+            { name: 'Red',     hex: '#DC2626', role: 'error' },
+            { name: 'Yellow',  hex: '#B45309', role: 'warning' },
+            { name: 'Blue',    hex: '#2563EB', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.03em',  family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.025em', family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 22, weight: '700', lineHeight: 1.27, letterSpacing: '-0.02em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 18, weight: '600', lineHeight: 1.44, letterSpacing: '-0.015em', family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 15, weight: '600', lineHeight: 1.47, letterSpacing: '-0.01em',  family: 'body',    group: 'heading' },
+            { path: 'body/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '-0.006em', family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 13, weight: '400', lineHeight: 1.46, letterSpacing: '-0.006em', family: 'body',    group: 'body' },
+            { path: 'body/xs',      size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '-0.006em', family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 13, weight: '500', lineHeight: 1.46, letterSpacing: '-0.006em', family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 11, weight: '400', lineHeight: 1.45, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 3 },
+            { name: 'md',     value: 5 },
+            { name: 'lg',     value: 8 },
+            { name: 'xl',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'xs',    x: 0, y: 1,  blur: 2,  spread: 0, opacity: 0.06 },
+            { name: 'sm',    x: 0, y: 2,  blur: 4,  spread: 0, opacity: 0.08 },
+            { name: 'md',    x: 0, y: 4,  blur: 12, spread: 0, opacity: 0.08 },
+            { name: 'lg',    x: 0, y: 8,  blur: 20, spread: 0, opacity: 0.08 },
+        ],
+    },
+
+    // ── VERCEL / GEIST ────────────────────────────────────────────────────────
+    {
+        id: 'vercel-geist',
+        name: 'Vercel / Geist',
+        icon: '▲',
+        description: "Vercel's minimal developer-first design language.",
+        category: 'modern',
+        fonts: {
+            heading: 'Geist',
+            body: 'Geist',
+            mono: 'Geist Mono',
+            monoFallbacks: ['JetBrains Mono', 'Fira Code', 'Roboto Mono'],
+        },
+        colors: [
+            { name: 'Foreground', hex: '#000000', role: 'primary' },
+            { name: 'Blue',       hex: '#0070F3', role: 'secondary' },
+            { name: 'Gray',       hex: '#888888', role: 'neutral' },
+            { name: 'Green',      hex: '#00B383', role: 'success' },
+            { name: 'Red',        hex: '#EE0000', role: 'error' },
+            { name: 'Amber',      hex: '#FF990A', role: 'warning' },
+            { name: 'Cyan',       hex: '#0070F3', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 64, weight: '700', lineHeight: 1.09, letterSpacing: '-0.04em',  family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 48, weight: '700', lineHeight: 1.17, letterSpacing: '-0.035em', family: 'heading', group: 'display' },
+            { path: 'display/sm',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.03em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.025em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 22, weight: '700', lineHeight: 1.27, letterSpacing: '-0.02em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '700', lineHeight: 1.44, letterSpacing: '-0.015em', family: 'heading', group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '-0.008em', family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '-0.008em', family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '-0.008em', family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '500', lineHeight: 1.43, letterSpacing: '-0.006em', family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '500', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/lg',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'code/md',      size: 13, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 6 },
+            { name: 'lg',     value: 8 },
+            { name: 'xl',     value: 12 },
+            { name: '2xl',    value: 16 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 1,  blur: 4,  spread: 0,  opacity: 0.12 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0,  opacity: 0.12 },
+            { name: 'lg',    x: 0, y: 8,  blur: 30, spread: 0,  opacity: 0.12 },
+        ],
+    },
+
+    // ── PINTEREST GESTALT ─────────────────────────────────────────────────────
+    {
+        id: 'pinterest-gestalt',
+        name: 'Pinterest Gestalt',
+        icon: '📌',
+        description: 'Consistent, accessible system for visual discovery.',
+        category: 'modern',
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'Fira Code',
+            monoFallbacks: MONO_FALLBACKS,
+        },
+        colors: [
+            { name: 'Red',     hex: '#E60023', role: 'primary' },
+            { name: 'Gray',    hex: '#767676', role: 'neutral' },
+            { name: 'Green',   hex: '#008744', role: 'success' },
+            { name: 'Error',   hex: '#CC0000', role: 'error' },
+            { name: 'Yellow',  hex: '#A35200', role: 'warning' },
+            { name: 'Blue',    hex: '#0765C7', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.015em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.01em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 24, weight: '700', lineHeight: 1.33, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 20, weight: '700', lineHeight: 1.40, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '700', lineHeight: 1.44, letterSpacing: '0em',      family: 'heading', group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '600', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '600', lineHeight: 1.33, letterSpacing: '0.025em',  family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
         spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
-        radii: [ { name: "SM", value: 4 }, { name: "MD", value: 8 }, { name: "LG", value: 12 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Elevation 100", x: 0, y: 2, blur: 4, spread: 0, opacity: 0.1 } ]
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 8 },
+            { name: 'lg',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 2,  blur: 4,  spread: 0, opacity: 0.10 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0, opacity: 0.10 },
+            { name: 'lg',    x: 0, y: 0,  blur: 8,  spread: 0, opacity: 0.10 },
+        ],
     },
+
+    // ── UBER BASE ─────────────────────────────────────────────────────────────
     {
-        id: "ant-design",
-        name: "Ant Design",
-        icon: "🐜",
-        description: "Enterprise-level UI design language.",
-        category: 'enterprise',
-        typography: {
-            roles: [
-                { name: "Heading/H1", size: 38, weight: "600", category: "heading" },
-                { name: "Heading/H3", size: 24, weight: "600", category: "heading" },
-                { name: "Text/Base", size: 14, weight: "400", category: "body" }
-            ]
-        },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "Roboto Mono" },
-            colors: [
-                { name: "Primary", hex: "#1677FF" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#000000" }, { name: "Success", hex: "#389E0D" },
-                { name: "Error", hex: "#CF1322" }, { name: "Warning", hex: "#D48806" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 20, 24, 32, 48],
-        radii: [ { name: "SM", value: 2 }, { name: "MD", value: 4 }, { name: "LG", value: 6 }, { name: "XL", value: 8 } ],
-        shadows: [ { name: "Low", x: 0, y: 2, blur: 8, spread: 0, opacity: 0.15 } ]
-    },
-    {
-        id: "pinterest-gestalt",
-        name: "Pinterest Gestalt",
-        icon: "📌",
-        description: "Consistency and accessibility for visual discovery.",
+        id: 'uber-base',
+        name: 'Uber Base',
+        icon: '🚗',
+        description: 'Structured design system for global scale.',
         category: 'modern',
-        typography: {
-            roles: [
-                { name: "Heading/600", size: 36, weight: "600", category: "heading" },
-                { name: "Heading/400", size: 20, weight: "600", category: "heading" },
-                { name: "Body/300", size: 16, weight: "400", category: "body" }
-            ]
+        fonts: {
+            heading: 'Inter',
+            body: 'Inter',
+            mono: 'JetBrains Mono',
+            monoFallbacks: MONO_FALLBACKS,
         },
-        defaults: {
-            fonts: { heading: "Inter", body: "Inter", mono: "SF Mono" },
-            colors: [
-                { name: "Brand", hex: "#E60023" }, { name: "Background", hex: "#FFFFFF" },
-                { name: "Foreground", hex: "#111111" }, { name: "Success", hex: "#008744" },
-                { name: "Error", hex: "#CC0000" }, { name: "Warning", hex: "#A35200" }
-            ]
-        },
-        spacing: [0, 4, 8, 12, 16, 24, 32, 48],
-        radii: [ { name: "100", value: 4 }, { name: "200", value: 8 }, { name: "300", value: 12 }, { name: "Full", value: 9999 } ],
-        shadows: [ { name: "Floating", x: 0, y: 0, blur: 8, spread: 0, opacity: 0.1 } ]
-    }
+        colors: [
+            { name: 'Blue',    hex: '#276EF1', role: 'primary' },
+            { name: 'Yellow',  hex: '#FFCB00', role: 'secondary' },
+            { name: 'Gray',    hex: '#545454', role: 'neutral' },
+            { name: 'Green',   hex: '#05A357', role: 'success' },
+            { name: 'Red',     hex: '#E11900', role: 'error' },
+            { name: 'Amber',   hex: '#966A00', role: 'warning' },
+            { name: 'Teal',    hex: '#0B7DA0', role: 'info' },
+        ],
+        typeRoles: [
+            { path: 'display/lg',   size: 44, weight: '700', lineHeight: 1.18, letterSpacing: '-0.025em', family: 'heading', group: 'display' },
+            { path: 'display/md',   size: 36, weight: '700', lineHeight: 1.22, letterSpacing: '-0.02em',  family: 'heading', group: 'display' },
+            { path: 'heading/h1',   size: 28, weight: '700', lineHeight: 1.29, letterSpacing: '-0.015em', family: 'heading', group: 'heading' },
+            { path: 'heading/h2',   size: 22, weight: '700', lineHeight: 1.27, letterSpacing: '-0.01em',  family: 'heading', group: 'heading' },
+            { path: 'heading/h3',   size: 18, weight: '700', lineHeight: 1.44, letterSpacing: '-0.005em', family: 'heading', group: 'heading' },
+            { path: 'body/lg',      size: 18, weight: '400', lineHeight: 1.56, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/md',      size: 16, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'body/sm',      size: 14, weight: '400', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'body' },
+            { path: 'label/md',     size: 14, weight: '700', lineHeight: 1.43, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'label/sm',     size: 12, weight: '700', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'label' },
+            { path: 'code/md',      size: 14, weight: '400', lineHeight: 1.50, letterSpacing: '0em',      family: 'mono',    group: 'code' },
+            { path: 'caption/md',   size: 12, weight: '400', lineHeight: 1.33, letterSpacing: '0em',      family: 'body',    group: 'caption' },
+        ],
+        spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
+        radii: [
+            { name: 'none',   value: 0 },
+            { name: 'sm',     value: 4 },
+            { name: 'md',     value: 8 },
+            { name: 'lg',     value: 12 },
+            { name: 'full',   value: 9999 },
+        ],
+        shadows: [
+            { name: 'sm',    x: 0, y: 2,  blur: 4,  spread: 0, opacity: 0.10 },
+            { name: 'md',    x: 0, y: 4,  blur: 8,  spread: 0, opacity: 0.10 },
+            { name: 'lg',    x: 0, y: 8,  blur: 16, spread: 0, opacity: 0.10 },
+        ],
+    },
 ];

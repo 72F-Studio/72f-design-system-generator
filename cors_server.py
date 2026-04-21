@@ -1,22 +1,18 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-import os
+import mimetypes
+
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("text/css", ".css")
+mimetypes.add_type("text/html", ".html")
+mimetypes.add_type("application/json", ".json")
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
-        return super().end_headers()
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        super().end_headers()
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.end_headers()
-
-if __name__ == '__main__':
-    port = 4421
-    print(f"Starting CORS-enabled server on port {port}...")
-    # Change directory to 'dist'
-    os.chdir('dist')
-    httpd = HTTPServer(('0.0.0.0', port), CORSRequestHandler)
-    httpd.serve_forever()
+server = HTTPServer(("0.0.0.0", 5173), CORSRequestHandler)
+print("Serving with CORS on http://localhost:5173")
+server.serve_forever()

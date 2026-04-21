@@ -2,9 +2,16 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
+  const commonServer = {
+    host: "0.0.0.0",
+    port: 5173,
+    cors: true,
+  };
+
   if (mode === "plugin") {
     return {
+      server: commonServer,
       build: {
         lib: {
           entry: resolve(__dirname, "src/plugin.ts"),
@@ -19,6 +26,8 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    base: command === "build" ? "/72f-design-system-generator/" : "/",
+    server: commonServer,
     plugins: [react()],
     build: {
       rollupOptions: {

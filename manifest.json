@@ -7,6 +7,6 @@
     "library:read",
     "library:write"
   ],
-  "code": "plugin-v1.js",
-  "ui": "index.html"
+  "code": "https://72f-studio.github.io/72f-design-system-generator/plugin-v1.js",
+  "ui": "https://72f-studio.github.io/72f-design-system-generator/index.html"
 }

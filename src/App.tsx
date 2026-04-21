@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ScrollText, LayoutDashboard, Settings2, Download } from "lucide-react";
+import { ScrollText, LayoutDashboard, Settings2, Download, Info } from "lucide-react";
 import GeneratorTab from "./components/GeneratorTab";
 import ManagerTab from "./components/ManagerTab";
 import ExportTab from "./components/ExportTab";
+import AboutTab from "./components/AboutTab";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("generator");
@@ -41,7 +42,8 @@ export default function App() {
           {[
             { id: "generator", icon: Settings2, label: "Generator" },
             { id: "manager", icon: LayoutDashboard, label: "Manager" },
-            { id: "export", icon: Download, label: "Export" }
+            { id: "export", icon: Download, label: "Export" },
+            { id: "about", icon: Info, label: "About" }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -69,6 +71,9 @@ export default function App() {
         </div>
         <div className={activeTab === "export" ? "block" : "hidden"}>
           <ExportTab />
+        </div>
+        <div className={activeTab === "about" ? "block" : "hidden"}>
+          <AboutTab />
         </div>
       </div>
 
